@@ -185,7 +185,7 @@ class Dataset(data.Dataset):
 
 
 if __name__ == '__main__':
-    root = os.getcwd()
+    root = os.path.abspath("datasets/")
 
     # choose dataset name from 'shapenetcorev2', 'shapenetpart', 'modelnet40' and 'modelnet10'
     dataset_name = 'modelnet40'
@@ -199,4 +199,5 @@ if __name__ == '__main__':
 
     item = 0
     ps, lb, n, f = d[item]
-    print(ps.size(), ps.type(), lb.size(), lb.type(), n, f) 
+    print(ps.size(), ps.type(), lb.size(), lb.type(), n, f)
+    print(lb)
