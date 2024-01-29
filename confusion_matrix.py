@@ -19,7 +19,7 @@ else:
 with open(os.path.join("datasets", "modelnet40_hdf5_2048", "shape_names.txt"), 'r') as f:
     label_map = f.read().splitlines()
 
-checkpoint = os.path.join("aug", "200.pth")
+checkpoint = os.path.join("checkpoints", "200.pth")
 model = PointNet(classes=40).to(device)
 temp = torch.load(checkpoint)
 model.load_state_dict(temp["model"])
@@ -56,7 +56,7 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
 
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
-    plt.colorbar()
+    # plt.colorbar()
     tick_marks = np.arange(len(classes))
     plt.xticks(tick_marks, classes, rotation=45)
     plt.yticks(tick_marks, classes)
@@ -71,5 +71,5 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     plt.xlabel('Predicted label')
     plt.show()
 
-plt.figure(figsize=(30, 30))
+plt.figure(figsize=(9, 9))
 plot_confusion_matrix(cm, label_map, normalize=False)
