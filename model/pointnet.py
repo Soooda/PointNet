@@ -15,7 +15,6 @@ class Tnet(nn.Module):
             nn.Conv1d(128, 1024, 1),
             nn.BatchNorm1d(1024),
             nn.ReLU(inplace=True),
-            nn.MaxPool1d(2048),
         )
         self.fc = nn.Sequential(
             nn.Flatten(1),
