@@ -33,7 +33,7 @@ class Tnet(nn.Module):
         output = self.conv(input)
         output = nn.MaxPool1d(output.size(-1))(output)
         output = self.fc(output).view(-1, self.k, self.k)
-        init = init.to(output.get_device())
+        init = init.to(output.device)
         output += init
         return output
     
