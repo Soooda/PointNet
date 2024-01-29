@@ -14,6 +14,7 @@ import h5py
 from glob import glob
 import numpy as np
 import torch.utils.data as data
+import open3d as o3d
 
 
 shapenetpart_cat2id = {'airplane': 0, 'bag': 1, 'cap': 2, 'car': 3, 'chair': 4, 
@@ -200,4 +201,7 @@ if __name__ == '__main__':
     item = 0
     ps, lb, n, f = d[item]
     print(ps.size(), ps.type(), lb.size(), lb.type(), n, f)
-    print(lb)
+
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(ps.numpy())
+    o3d.visualization.draw_geometries([pcd], width=800, height=600)
