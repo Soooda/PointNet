@@ -40,7 +40,9 @@ with torch.no_grad():
         all_preds += list(predicted.cpu().numpy())
         all_labels += list(labels.cpu().numpy())
 
-        print("Batch [{:>4d} / {:>4d}]".format(i + 1, len(valid_loader)))
+        print("Batch [{:>4d} / {:>4d}]\r".format(i + 1, len(valid_loader)), end="")
+
+print()
 
 cm = confusion_matrix(all_labels, all_preds)
 
@@ -69,5 +71,5 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
     plt.xlabel('Predicted label')
     plt.show()
 
-plt.figure(figsize=(8, 8))
-plot_confusion_matrix(cm, label_map, normalize=True)
+plt.figure(figsize=(30, 30))
+plot_confusion_matrix(cm, label_map, normalize=False)
