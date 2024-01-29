@@ -21,7 +21,7 @@ with open(os.path.join("datasets", "modelnet40_hdf5_2048", "shape_names.txt"), '
 
 checkpoint = os.path.join("checkpoints", "200.pth")
 model = PointNet(classes=40).to(device)
-temp = torch.load(checkpoint)
+temp = torch.load(checkpoint, map_location=device)
 model.load_state_dict(temp["model"])
 d = Dataset(os.path.abspath("datasets/"), num_points=1024, split="test")
 valid_loader = DataLoader(d, batch_size=64)

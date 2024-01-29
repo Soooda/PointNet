@@ -20,9 +20,9 @@ checkpoint = os.path.join("checkpoints", "200.pth")
 class_choice = None
 
 model = PointNet(classes=40).to(device)
-temp = torch.load(checkpoint)
+temp = torch.load(checkpoint, map_location=device)
 model.load_state_dict(temp["model"])
-d = Dataset(os.path.abspath("datasets/"), num_points=1024, split="test", class_choice=class_choice)
+d = Dataset(os.path.abspath("datasets/"), num_points=1024, split="test", class_choice=class_choice, random_rotate=True, random_jitter=True, random_translate=True)
 model.eval()
 # print("datasize:", d.__len__())
 
@@ -39,3 +39,4 @@ ps = ps.to(device)
 outputs, _, _ = model(ps.unsqueeze(0).transpose(1, 2))
 _, predicted = torch.max(outputs.data, 1)
 print("Ground Truth: {:15s} Predicted: {:15s}".format(label_map[lb[0]], label_map[predicted[0]]))
+

@@ -19,7 +19,7 @@ batch_size = 32
 learning_rate = 0.001
 pin_memory = True if device.type == 'cuda' else False
 
-train_ds = Dataset(os.path.abspath("datasets/"), num_points=1024, split="train", random_jitter=True, random_rotate=True, random_translate=True)
+train_ds = Dataset(os.path.abspath("datasets/"), num_points=1024, split="train")
 train_loader = DataLoader(train_ds, shuffle=True, batch_size=batch_size, pin_memory=pin_memory)
 valid_ds = Dataset(os.path.abspath("datasets/"), num_points=1024, split="test")
 valid_loader = DataLoader(valid_ds, batch_size=batch_size * 2, pin_memory=pin_memory)
@@ -44,7 +44,7 @@ for epoch in range(1, num_epochs + 1):
     if os.path.exists(checkpoint):
         if os.path.exists(os.sep.join(("checkpoints", str(epoch + 1) + ".pth"))):
             continue
-        temp = torch.load(checkpoint)
+        temp = torch.load(checkpoint, map_location=device)
         model.load_state_dict(temp["model"])
         optim.load_state_dict(temp["optimizer"])
         scheduler.load_state_dict(temp["scheduler"])
@@ -94,3 +94,4 @@ for epoch in range(1, num_epochs + 1):
     if not os.path.exists("./checkpoints"):
         os.mkdir("./checkpoints")
     torch.save(checkpoints, os.sep.join(("checkpoints", str(epoch) + ".pth")))
+
