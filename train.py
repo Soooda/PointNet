@@ -19,15 +19,16 @@ batch_size = 32
 learning_rate = 0.001
 pin_memory = True if device.type == 'cuda' else False
 
-train_ds = Dataset(os.path.abspath("datasets/"), split="train")
+train_ds = Dataset(os.path.abspath("datasets/"), num_points=1024, split="train")
 train_loader = DataLoader(train_ds, shuffle=True, num_workers=4, batch_size=batch_size, pin_memory=pin_memory)
-valid_ds = Dataset(os.path.abspath("datasets/"), split="test")
+valid_ds = Dataset(os.path.abspath("datasets/"), num_points=1024, split="test")
 valid_loader = DataLoader(valid_ds, num_workers=4, batch_size=batch_size * 2, pin_memory=pin_memory)
 print('Train dataset size: ', len(train_ds))
 print('Valid dataset size: ', len(valid_ds))
 
 model = PointNet(classes=40).to(device)
 optim = torch.optim.Adam(model.parameters(), lr=learning_rate)
+scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optim, step_size=20, gamma=0.5)
 
 def loss_fn(output, labels, m3x3, m64x64, alpha=0.0001):
     criterion = torch.nn.NLLLoss()
@@ -46,6 +47,7 @@ for epoch in range(1, num_epochs + 1):
         temp = torch.load(checkpoint)
         model.load_state_dict(temp["model"])
         optim.load_state_dict(temp["optimizer"])
+        scheduler.load_state_dict(temp["scheduler"])
         continue
 
     running_loss = 0.0
@@ -63,10 +65,6 @@ for epoch in range(1, num_epochs + 1):
         optim.step()
 
         running_loss += loss.item()
-        # print statistics
-        if i % 10 == 9:    # print every 10 mini-batches
-            print('[Epoch: %d, Batch: %4d / %4d], loss: %.3f' % (epoch, i + 1, len(train_loader), running_loss / 10))
-            running_loss = 0.0
 
     model.eval()
     correct = total = 0
@@ -74,18 +72,24 @@ for epoch in range(1, num_epochs + 1):
         with torch.no_grad():
             for data in valid_loader:
                 inputs, labels, _, _ = data
-                outputs, _, _ = model(inputs)
+                inputs = inputs.to(device)
+                labels = labels.to(device)
+                labels = labels.squeeze()
+                outputs, _, _ = model(inputs.transpose(1, 2))
                 _, predicted = torch.max(outputs.data, 1)
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
         val_acc = 100. * correct / total
-        print('Valid accuracy: %d %%' % val_acc)
-    
+    # print statistics
+    print("Epoch {:<4} Loss: {:<8.4f} Valid accuracy: {:<6.2f}%".format(epoch, running_loss, val_acc))
+
+    scheduler.step() 
     # Checkpoints
     checkpoints = {
         "model": model.state_dict(),
         "optimizer": optim.state_dict(),
+        "scheduler": optim.state_dict(),
     }
     if not os.path.exists("./checkpoints"):
         os.mkdir("./checkpoints")
