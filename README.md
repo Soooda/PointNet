@@ -9,6 +9,7 @@ $ conda create -n PointNet pip python=3.10
 $ conda install pytorch==1.12.1 cudatoolkit=11.3 -c pytorch
 # Mac MPS
 $ conda install pytorch::pytorch -c pytorch
+
 $ pip install h5py open3d
 ```
 
