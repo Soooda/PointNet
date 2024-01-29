@@ -33,8 +33,8 @@ scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optim, step_size=20, gamma
 def loss_fn(output, labels, m3x3, m64x64, alpha=0.001):
     criterion = torch.nn.NLLLoss()
     bs = output.size(0)
-    id3x3 = torch.eye(3, requires_grad=True).repeat(bs, 1, 1).to(output.get_device())
-    id64x64 = torch.eye(64, requires_grad=True).repeat(bs, 1, 1).to(output.get_device())
+    id3x3 = torch.eye(3, requires_grad=True).repeat(bs, 1, 1).to(output.device)
+    id64x64 = torch.eye(64, requires_grad=True).repeat(bs, 1, 1).to(output.device)
     diff3x3 = id3x3 - torch.bmm(m3x3, m3x3.transpose(1, 2))
     diff64x64 = id64x64 - torch.bmm(m64x64, m64x64.transpose(1, 2))
     return criterion(output, labels) + alpha * (torch.norm(diff3x3) + torch.norm(diff64x64)) / float(bs)
