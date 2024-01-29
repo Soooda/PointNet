@@ -19,7 +19,7 @@ batch_size = 32
 learning_rate = 0.001
 pin_memory = True if device.type == 'cuda' else False
 
-train_ds = Dataset(os.path.abspath("datasets/"), num_points=1024, split="train")
+train_ds = Dataset(os.path.abspath("datasets/"), num_points=1024, split="train", random_jitter=True, random_rotate=True, random_translate=True)
 train_loader = DataLoader(train_ds, shuffle=True, num_workers=4, batch_size=batch_size, pin_memory=pin_memory)
 valid_ds = Dataset(os.path.abspath("datasets/"), num_points=1024, split="test")
 valid_loader = DataLoader(valid_ds, num_workers=4, batch_size=batch_size * 2, pin_memory=pin_memory)
@@ -30,7 +30,7 @@ model = PointNet(classes=40).to(device)
 optim = torch.optim.Adam(model.parameters(), lr=learning_rate)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer=optim, step_size=20, gamma=0.5)
 
-def loss_fn(output, labels, m3x3, m64x64, alpha=0.0001):
+def loss_fn(output, labels, m3x3, m64x64, alpha=0.001):
     criterion = torch.nn.NLLLoss()
     bs = output.size(0)
     id3x3 = torch.eye(3, requires_grad=True).repeat(bs, 1, 1).to(output.get_device())
