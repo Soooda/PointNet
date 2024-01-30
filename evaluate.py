@@ -22,7 +22,7 @@ class_choice = None
 model = PointNet(classes=40).to(device)
 temp = torch.load(checkpoint, map_location=device)
 model.load_state_dict(temp["model"])
-d = Dataset(os.path.abspath("datasets/"), num_points=1024, split="test", class_choice=class_choice, random_rotate=True, random_jitter=True, random_translate=True)
+d = Dataset(os.path.abspath("datasets/"), num_points=1024, split="test", class_choice=class_choice)
 model.eval()
 # print("datasize:", d.__len__())
 
@@ -33,7 +33,7 @@ print(ps.size(), f)
 # Visualises the point cloud
 pcd = o3d.geometry.PointCloud()
 pcd.points = o3d.utility.Vector3dVector(ps.numpy())
-o3d.visualization.draw_geometries([pcd], width=800, height=600)
+o3d.visualization.draw_geometries([pcd], width=1280, height=960)
 
 ps = ps.to(device)
 outputs, _, _ = model(ps.unsqueeze(0).transpose(1, 2))
